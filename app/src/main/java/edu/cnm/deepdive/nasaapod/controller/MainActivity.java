@@ -17,6 +17,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import edu.cnm.deepdive.nasaapod.BuildConfig;
 import edu.cnm.deepdive.nasaapod.R;
+import edu.cnm.deepdive.nasaapod.controller.DateTimePickerFragment.Mode;
 import edu.cnm.deepdive.nasaapod.model.Apod;
 import edu.cnm.deepdive.nasaapod.service.ApodService;
 import java.io.IOException;
@@ -84,13 +85,7 @@ public class MainActivity extends AppCompatActivity {
     progressSpinner = findViewById(R.id.progress_spinner);
     progressSpinner.setVisibility(View.GONE);
     jumpDate = findViewById(R.id.jump_date);
-    jumpDate.setOnClickListener(new OnClickListener() {
-      // TODO Use lambda form
-      @Override
-      public void onClick(View v) {
-        // TODO Display date picker.
-      }
-    });
+    jumpDate.setOnClickListener(v -> pickDate());
   }
 
   private void setupService() {
@@ -108,11 +103,16 @@ public class MainActivity extends AppCompatActivity {
 
   private void setupDefaults(Bundle savedInstanceState) {
     calendar = Calendar.getInstance();
-    // FIXME Remove when running fully
-    calendar.set(Calendar.MONTH, 9); // Month starts at 0 - blame C
-    calendar.set(Calendar.DAY_OF_MONTH, 30);
     // TODO Check for savedInstanceState
     new ApodTask().execute();
+  }
+
+  private void pickDate() {
+    DateTimePickerFragment picker = new DateTimePickerFragment();
+    picker.setMode(Mode.DATE);
+    picker.setCalendar(calendar);
+    picker.setListener((cal) -> new ApodTask().execute(cal.getTime()));
+    picker.show(getSupportFragmentManager(), picker.getClass().getSimpleName());
   }
 
   private class ApodTask extends AsyncTask<Date, Void, Apod> {
