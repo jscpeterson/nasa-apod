@@ -30,8 +30,8 @@ public class Apod implements Parcelable {
   private String mediaType;
 
   @Expose
-  @SerializedName("hdurl")
-  private String hdurl;
+  @SerializedName("hdUrl")
+  private String hdUrl;
 
   @Expose
   @SerializedName("service_version")
@@ -86,11 +86,11 @@ public class Apod implements Parcelable {
   }
 
   public String getHdurl() {
-    return hdurl;
+    return hdUrl;
   }
 
   public void setHdurl(String hdurl) {
-    this.hdurl = hdurl;
+    this.hdUrl = hdurl;
   }
 
   public String getServiceVersion() {
@@ -108,14 +108,29 @@ public class Apod implements Parcelable {
 
   @Override
   public void writeToParcel(Parcel dest, int flags) {
-    // TODO Write fields to dest.
+    dest.writeLong(date.getTime());
+    dest.writeString("title");
+    dest.writeString("explanation");
+    dest.writeString("copyright");
+    dest.writeString("URL");
+    dest.writeString("mediaType");
+    dest.writeString("hdUrl");
+    dest.writeString("serviceVersion");
   }
 
   private static class Creator implements Parcelable.Creator<Apod> {
 
     @Override
     public Apod createFromParcel(Parcel source) {
-      // TODO Create Apod object & populate its fields from source
+      Apod apod = new Apod();
+      apod.date = new Date(source.readLong());
+      apod.title = source.readString();
+      apod.explanation = source.readString();
+      apod.copyright = source.readString();
+      apod.url = source.readString();
+      apod.mediaType = source.readString();
+      apod.hdUrl = source.readString();
+      apod.serviceVersion = source.readString();
       return null;
     }
 

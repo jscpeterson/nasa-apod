@@ -54,6 +54,13 @@ public class MainActivity extends AppCompatActivity {
     setupDefaults(savedInstanceState);
   }
 
+  @Override
+  protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putLong(CALENDAR_KEY, calendar.getTimeInMillis());
+    outState.putParcelable(APOD_KEY, apod);
+  }
+
   private void setupWebView() {
     webView = findViewById(R.id.web_view);
     webView.setWebViewClient(new WebViewClient() {
@@ -103,8 +110,17 @@ public class MainActivity extends AppCompatActivity {
 
   private void setupDefaults(Bundle savedInstanceState) {
     calendar = Calendar.getInstance();
-    // TODO Check for savedInstanceState
-    new ApodTask().execute();
+    if (savedInstanceState != null) {
+      calendar
+          .setTimeInMillis((savedInstanceState.getLong(CALENDAR_KEY, calendar.getTimeInMillis())));
+      apod = savedInstanceState.getParcelable(APOD_KEY);
+    }
+    if (apod != null) {
+      progressSpinner.setVisibility(View.VISIBLE);
+      webView.loadUrl(apod.getUrl());
+    } else {
+      new ApodTask().execute();
+    }
   }
 
   private void pickDate() {
@@ -128,7 +144,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onPostExecute(Apod apod) {
       MainActivity.this.apod = apod;
       // TODO Handle hdUrl.
-      webView.loadUrl(apod.getUrl());
+      try {
+        webView.loadUrl(apod.getUrl());
+      } catch (NullPointerException e) {
+        Toast.makeText(MainActivity.this, R.string.error_message_nullpointer, Toast.LENGTH_LONG).show();
+      }
     }
 
     @Override
